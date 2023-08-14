@@ -18,16 +18,16 @@ async def create_todo(request: Request, response: Response, data: TodoBody, csrf
     - CSRF token
 
     Args:
-        request (Request): request object
-        response (Response): response object
+        request (Request): FastAPI request object
+        response (Response): FastAPI response object
         data (TodoBody): {"title": str, "description": str}
-        csrf_protect (CsrfProtect): CSRF protection
+        csrf_protect (CsrfProtect): CSRF protection. Defaults to Depends().
 
     Raises:
-        HTTPException: Failed -> 404 Error if the response object does not exist.
+        HTTPException: 404 Error -> Response does not exist.
 
     Returns:
-        Union[Todo, bool]: Success -> {"id": str, "title": str, "description": str}, Failed -> Fales
+        Union[Todo, bool]: Success -> Todo data, Failed -> Fales
     """
     new_token = auth.verify_csrf_update_jwt(request, csrf_protect)
     todo = jsonable_encoder(data)
@@ -44,13 +44,13 @@ async def get_todo(request: Request) -> Union[List[Todo], bool]:
     - JWT(httpOnly)
 
     Args:
-        request (Request): request object
+        request (Request): FastAPI request object
 
     Raises:
-        HTTPException: Failed -> 404 Error if the response object does not exist.
+        HTTPException: 404 Error -> Response does not exist.
 
     Returns:
-        Union[List[Todo], bool]: Success -> {"id": str, "title": str, "description": str}, Failed -> Fales
+        Union[List[Todo], bool]: Success -> Todo data, Failed -> Fales
     """
     auth.verify_jwt(request)
     res = await db_find_todo_all()
@@ -65,15 +65,15 @@ async def get_single_todo(request: Request, response: Response, id: str) -> Unio
     - Refresh JWT
 
     Args:
-        request (Request): request object
-        response (Response): response object
+        request (Request): FastAPI request object
+        response (Response): FastAPI response object
         id (str): Task ID
 
     Raises:
-        HTTPException: Failed -> 404 Error if the response object does not exist.
+        HTTPException: 404 Error -> Response does not exist.
 
     Returns:
-        Union[Todo, bool]: Success -> {"id": str, "title": str, "description": str}, Failed -> Fales
+        Union[Todo, bool]: Success -> Todo data, Failed -> Fales
     """
     new_token, _ = auth.verify_update_jwt(request)
     res = await db_find_todo_by_id(id)
@@ -90,19 +90,19 @@ async def update_todo(request: Request, response: Response, id: str, data: TodoB
     - CSRF token
 
     Args:
-        request (Request): request object
-        response (Response): response object
+        request (Request): FastAPI request object
+        response (Response): FastAPI response object
         id (str): Task ID
         data (TodoBody): {"title": str, "desciption": str}
-        csrf_protect (CsrfProtect): CSRF protection
+        csrf_protect (CsrfProtect): CSRF protection. Defaults to Depends().
 
     Raises:
-        HTTPException: Failed -> 404 Error if the response object does not exist.
+        HTTPException: 404 Error -> Response does not exist.
 
     Returns:
-        Union[Todo, bool]: Success -> {"id": str, "title": str, "description": str}, Failed -> Fales
+        Union[Todo, bool]: Success -> Todo data, Failed -> Fales
     """
-    new_token = auth.verify_csrf_update_jwt(request)
+    new_token = auth.verify_csrf_update_jwt(request, csrf_protect)
     todo = jsonable_encoder(data)
     res = await db_update_todo(id, todo)
     response.set_cookie(key="access_token", value=f"Bearer {new_token}", httponly=True, samesite="none", secure=True)
@@ -118,16 +118,16 @@ async def delete_todo(request: Request, response: Response, id: str, csrf_protec
     - CSRF token
 
     Args:
-        request (Request): request object
-        response (Response): response object
+        request (Request): FastAPI request object
+        response (Response): FastAPI response object
         id (str): Task ID
-        csrf_protect (CsrfProtect): CSRF protection
+        csrf_protect (CsrfProtect): CSRF protection. Defaults to Depends().
 
     Raises:
-        HTTPException: Failed -> 404 Error if the response object does not exist.
+        HTTPException: 404 Error -> Response does not exist.
 
     Returns:
-        SuccessMsg: {"message": str}
+        SuccessMsg: Return message when deletion was successful
     """
     new_token = auth.verify_csrf_update_jwt(request)
     res = await db_delete_todo(id)
