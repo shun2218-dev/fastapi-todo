@@ -1,6 +1,8 @@
 """Script to export the ReDoc documentation page into a standalone HTML file."""
 
 import json
+import os
+import shutil
 
 from main import app
 
@@ -31,6 +33,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+doc_dir = "doc"
+path_from = "index.html"
+path_to = "doc/index.html"
+
 if __name__ == "__main__":
-    with open(f"api-docs-FastAPI-todo.html", "w") as fd:
+    with open(f"index.html", "w") as fd:
         print(HTML_TEMPLATE % json.dumps(app.openapi()), file=fd)
+    if os.path.isdir(doc_dir):
+        shutil.rmtree(doc_dir)        
+    os.mkdir(doc_dir)
+    shutil.move(path_from, path_to)
