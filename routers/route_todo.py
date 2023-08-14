@@ -20,7 +20,7 @@ async def create_todo(request: Request, response: Response, data: TodoBody, csrf
     Args:
         request (Request): FastAPI request object
         response (Response): FastAPI response object
-        data (TodoBody): {"title": str, "description": str}
+        data (TodoBody): Todo data
         csrf_protect (CsrfProtect): CSRF protection. Defaults to Depends().
 
     Raises:
@@ -93,7 +93,7 @@ async def update_todo(request: Request, response: Response, id: str, data: TodoB
         request (Request): FastAPI request object
         response (Response): FastAPI response object
         id (str): Task ID
-        data (TodoBody): {"title": str, "desciption": str}
+        data (TodoBody): Todo data
         csrf_protect (CsrfProtect): CSRF protection. Defaults to Depends().
 
     Raises:
